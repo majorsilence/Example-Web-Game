@@ -63,12 +63,15 @@ var cpaddle = {
     xpos: 0,
     ypos: 0,
     paddlespeed: 5,
+    centerpos: function(){
+        return xpos + (width/2);
+    },
     updatePos: function () {
         that = this;
         // update the position of the paddle.  If the paddle
         // is outside the bounds of the canvas move it back
         // into the bounds of the canvas
-        if (that.xpos + that.xvelocity > canvasWidth - that.width) {
+        if (that.centerpos + that.xvelocity > canvasWidth - that.width) {
             xpos = canvasWidth - that.width;
         }
         else if (that.xpos + that.xvelocity < 0) {
@@ -181,7 +184,9 @@ function startgame(canvasName) {
             player.xvelocity = 0;
         }
 
-        if (ball.yspeed>0){
+        // move ai paddle
+        if (ball.yspeed > 0) {
+            rand = 100 * Math.random() % 30;
             if (ai.xpos > (ball.x - rand)){
                 ai.xvelocity = -ai.paddlespeed;
             }
@@ -189,9 +194,20 @@ function startgame(canvasName) {
                 ai.xvelocity = ai.paddlespeed;
             }
         }
-        else{
-            rand=100*Math.random()%30;
-            ai.xvelocity = 0;
+        else {
+            // if the ball is moving away from the ai paddle and less then 50
+            // points away stop moving
+            if (Math.abs(ai.centerpos - ball.x) > 250) {
+                if (ai.centerpos > ball.x) {
+                    ai.xpos += -ai.paddlespeed;
+                }
+                else if (ai.centerpos < ball.x) {
+                    ai.xpos += ai.paddlespeed;
+                }
+            }
+            else {
+                ai.xvelocity = 0;
+            }
         }   
         if (ai.xpos < 0){
             ai.xpos=3;
