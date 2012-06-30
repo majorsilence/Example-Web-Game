@@ -7,8 +7,8 @@ include("canvas-utils.js");
 // http://canvasvsdoc.codeplex.com/
 
 // Begin Setup
-var canvasWidth=150;
-var canvasHeight=150;
+var canvasWidth = 0.90 * window.innerWidth;
+var canvasHeight = 0.90 *  window.innerHeight;
 
 // Add a create function to Object.
 if (typeof Object.create !== 'function') {
@@ -24,7 +24,7 @@ if (typeof Object.create !== 'function') {
 
 
 
-var paddle = {
+var cpaddle = {
     width: 32,
     height: 10,
     xvelocity: 0,
@@ -56,6 +56,22 @@ var paddle = {
     }
 }
 
+var cball = {
+    x: 0,
+    y: 0,
+    XSpeed: 2.5,
+    YSpeed: 2.5,
+    draw: function (surface) {
+        that = this;
+        surface.fillStyle = "rgba(0, 0, 0, 0.5)";
+
+        surface.beginPath();
+        surface.arc(that.x, that.y, 5, 0, Math.PI * 2, true);
+        surface.closePath();
+        surface.fill();
+
+    }
+}
 
 function draw(canvasName) {
     // Doing it this way will give intellisense while in visual studio
@@ -67,25 +83,31 @@ function draw(canvasName) {
 			return;
 	}
 
-    var loopFinised = false;
-
+	canvas.height = canvasHeight;
+	canvas.width = canvasWidth;
 
     var ctx = canvas.getContext('2d');
-    var player = Object.create(paddle);
+    
+    var player = Object.create(cpaddle);
     player.xpos = canvasWidth / 2;
     player.ypos = canvasHeight - 20;
 
-    var ai = Object.create(paddle);
+    var ai = Object.create(cpaddle);
     ai.xpos = canvasWidth / 2;
     ai.ypos = 20;
+    
+    var ball = Object.create(cball);
+    ball.x = player.xpos;
+    ball.y = player.ypos - 5;
 
-   
     drawscreen(ctx);
+
+    var loopFinised = false;
 
    do {
 
        
-
+        // Event Handling
 
 
 
@@ -98,14 +120,14 @@ function draw(canvasName) {
         surface.fillStyle = "rgb(255, 255, 255)";
         surface.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // Redraw player paddle
-       
+        // Redraw player paddle 
         player.draw(surface);
 
         // Redraw ai paddle
         ai.draw(surface);
 
         // Redraw ball
+        ball.draw(surface);
 
     }
 
