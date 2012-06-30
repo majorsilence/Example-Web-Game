@@ -79,9 +79,8 @@ function draw(canvasName) {
     ai.xpos = canvasWidth / 2;
     ai.ypos = 20;
 
-    ai.draw(ctx);
-    player.draw(ctx);
-
+   
+    drawscreen(ctx);
 
    do {
 
@@ -92,6 +91,23 @@ function draw(canvasName) {
 
         loopFinised = true;
     } while (loopFinised == false)
+    
+    function drawscreen(surface) {
+
+        // redraw surface background
+        surface.fillStyle = "rgb(255, 255, 255)";
+        surface.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // Redraw player paddle
+       
+        player.draw(surface);
+
+        // Redraw ai paddle
+        ai.draw(surface);
+
+        // Redraw ball
+
+    }
 
 }
 
