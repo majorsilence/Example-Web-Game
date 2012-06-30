@@ -10,6 +10,9 @@ include("canvas-utils.js");
 var canvasWidth = 0.90 * window.innerWidth;
 var canvasHeight = 0.90 *  window.innerHeight;
 
+leftKeyDown = false;
+rightKeyDown = false;
+
 // Add a create function to Object.
 if (typeof Object.create !== 'function') {
     Object.create = function (o) {
@@ -19,6 +22,35 @@ if (typeof Object.create !== 'function') {
     }
 }
 
+
+
+document.onkeydown = function (evt) {
+    // left = 37
+    // up = 38
+    // right = 39
+    // down = 40
+    if (evt.keyCode == 39) {
+        rightKeyDown = true;
+    }
+    else if (evt.keyCode == 37) {
+        leftKeyDown = true;
+    }
+
+};
+
+document.onkeyup = function (evt) {
+    // left = 37
+    // up = 38
+    // right = 39
+    // down = 40
+    if (evt.keyCode == 39) {
+        rightKeyDown = false;
+    }
+    else if (evt.keyCode == 37) {
+        leftKeyDown = false;
+    }
+
+};  
 
 // End Setup
 
@@ -73,7 +105,7 @@ var cball = {
     }
 }
 
-function draw(canvasName) {
+function startgame(canvasName) {
     // Doing it this way will give intellisense while in visual studio
     var canvas = Canvas.vsGet(document.getElementById(canvasName));
 
@@ -88,32 +120,37 @@ function draw(canvasName) {
 
     var ctx = canvas.getContext('2d');
     
+    // Player
     var player = Object.create(cpaddle);
     player.xpos = canvasWidth / 2;
     player.ypos = canvasHeight - 20;
 
+    // AI Player
     var ai = Object.create(cpaddle);
     ai.xpos = canvasWidth / 2;
     ai.ypos = 20;
     
+    // Ball
     var ball = Object.create(cball);
     ball.x = player.xpos;
     ball.y = player.ypos - 5;
 
+    // Initial Screen Setup
     drawscreen(ctx);
 
-    var loopFinised = false;
+    // Start the game
+    // Call the game loop function 60 times persecond (60 FPS)
+    this._intervalId = setInterval(gameloop, 1000 / 60);
 
-   do {
-
-       
-        // Event Handling
-
+    // To stop the game, use the following:
+    //clearInterval(this._intervalId);
+ 
 
 
-        loopFinised = true;
-    } while (loopFinised == false)
-    
+    function gameloop() {
+        drawscreen(ctx);
+    }
+
     function drawscreen(surface) {
 
         // redraw surface background
