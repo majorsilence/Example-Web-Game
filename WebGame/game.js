@@ -206,9 +206,16 @@ function startgame(canvasName) {
         if (ball.x < 0 || ball.x > canvasWidth){
             ball.xspeed = -ball.xspeed;
         }
- 
-        if (ball.y < 0 || ball.y > canvasHeight){
+
+        if (ball.y < 0) {
+            // Player Scored
             ball.yspeed = -ball.yspeed;
+            score.playerscore += 1;
+        }
+        else if (ball.y > canvasHeight) {
+            // AI Scored
+            ball.yspeed = -ball.yspeed;
+            score.aiscore += 1;
         }
 
         // check to see if hit player paddle
