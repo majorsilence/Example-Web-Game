@@ -208,9 +208,9 @@ function startgame(canvasName) {
         }
         //check to see if ai paddle hit
         if (ball.yspeed > 0){
-            if (ball.y >= ai.ypos && ball.y <= ai.ypos+player.height)
+            if (ball.y >= ai.ypos && ball.y <= ai.ypos+ai.height)
             {
-                if (ball.x >= ai.XPos-2 && ball.x <= ai.xpos + player.width)
+                if (ball.x >= ai.xpos-2 && ball.x <= ai.xpos + ai.width)
                 {
                     ball.yspeed = -ball.yspeed;
                 }
