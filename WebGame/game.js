@@ -69,7 +69,7 @@ var cpaddle = {
         // is outside the bounds of the canvas move it back
         // into the bounds of the canvas
         if (that.xpos + that.xvelocity > canvasWidth - that.width) {
-            xpos = canvasWidth - width;
+            xpos = canvasWidth - that.width;
         }
         else if (that.xpos + that.xvelocity < 0) {
             that.xpos = 0;
@@ -144,10 +144,78 @@ function startgame(canvasName) {
 
     // To stop the game, use the following:
     //clearInterval(this._intervalId);
- 
+
 
 
     function gameloop() {
+        rand = 0;
+
+        if (rightKeyDown)
+        {
+            player.xvelocity = player.paddlespeed;
+        }
+        else if(leftKeyDown)
+        {
+            player.xvelocity = -player.paddlespeed;
+        }
+        else
+        {
+            player.xvelocity = 0;
+        }
+
+        if (ball.yspeed>0){
+            if (ai.xpos > (ball.x - rand)){
+                ai.xvelocity = -ai.paddlespeed;
+            }
+            if (ai.xpos < (ball.x + rand)){
+                ai.xvelocity = ai.paddlespeed;
+            }
+        }
+        else{
+            rand=100*Math.random()%30;
+            ai.xvelocity = 0;
+        }   
+        if (ai.xpos < 0){
+            ai.xpos=3;
+        } 
+        if (ai.xpos >= canvasWidth) {
+            ai.xpos = canvasWidth-30;  
+        }
+
+        ball.x = ball.x + ball.xspeed;
+        ball.y = ball.y + -ball.yspeed;
+
+        if (ball.x < 0 || ball.x > canvasWidth){
+            ball.xspeed = -ball.xspeed;
+        }
+ 
+        if (ball.y < 0 || ball.y > canvasHeight){
+            ball.yspeed = -ball.yspeed;
+        }
+
+        // check to see if hit player paddle
+        // and whether the ball is behind paddle or coming in front
+        // left of paddle is beginning of position x
+        // top of paddle is beginning of position y
+        if (ball.yspeed < 0){
+            if (ball.y >= player.ypos && ball.y <= player.ypos + player.height){
+                if ( (ball.x >= (player.xpos-2)) && (ball.x <= (player.xpos + player.width)) ){
+                    ball.yspeed = -ball.yspeed;
+                }
+            }
+        }
+        //check to see if ai paddle hit
+        if (ball.yspeed > 0){
+            if (ball.y >= ai.ypos && ball.y <= ai.ypos+player.height)
+            {
+                if (ball.x >= ai.XPos-2 && ball.x <= ai.xpos + player.width)
+                {
+                    ball.yspeed = -ball.yspeed;
+                }
+            }
+        }
+
+
         drawscreen(ctx);
     }
 
