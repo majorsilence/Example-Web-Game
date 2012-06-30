@@ -6,15 +6,56 @@ include("canvas-utils.js");
 // and see
 // http://canvasvsdoc.codeplex.com/
 
-function include(filename) {
-    var head = document.getElementsByTagName('head')[0];
+// Begin Setup
+var canvasWidth=150;
+var canvasHeight=150;
 
-    script = document.createElement('script');
-    script.src = filename;
-    script.type = 'text/javascript';
-
-    head.appendChild(script)
+// Add a create function to Object.
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        var F = function () { };
+        f.prototype = o;
+        return new F();
+    }
 }
+
+
+// End Setup
+
+
+
+var paddle = {
+    width: 32,
+    height: 10,
+    xvelocity: 0,
+    xpos: 0,
+    ypos: 0,
+    paddlespeed: 5,
+    updatePos: function () {
+        that = this;
+        // update the position of the paddle.  If the paddle
+        // is outside the bounds of the canvas move it back
+        // into the bounds of the canvas
+        if (that.xpos + that.xvelocity > canvasWidth - that.width) {
+            xpos = canvasWidth - width;
+        }
+        else if (that.xpos + that.xvelocity < 0) {
+            that.xpos = 0;
+        }
+        else {
+            that.xpos = that.xpos + that.xvelocity;
+        }
+
+    },
+    draw: function (surface) {
+        that = this;
+        that.updatePos();
+
+        surface.fillStyle = "rgba(238, 130, 238, 0.5)";
+        surface.fillRect(that.xpos, that.ypos, that.width, that.height);
+    }
+}
+
 
 function draw(canvasName) {
     // Doing it this way will give intellisense while in visual studio
@@ -26,12 +67,42 @@ function draw(canvasName) {
 			return;
 	}
 
-	var ctx = canvas.getContext('2d');
+    var loopFinised = false;
 
-	ctx.fillStyle = "rgb(200, 0, 0)";
-	ctx.fillRect(10, 10, 55, 50);
-	
-	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-	ctx.fillRect(30, 30, 55, 50);
+
+    var ctx = canvas.getContext('2d');
+    var player = Object.create(paddle);
+    player.xpos = canvasWidth / 2;
+    player.ypos = canvasHeight - 20;
+
+    var ai = Object.create(paddle);
+    ai.xpos = canvasWidth / 2;
+    ai.ypos = 20;
+
+    ai.draw(ctx);
+    player.draw(ctx);
+
+
+   do {
+
+       
+
+
+
+
+        loopFinised = true;
+    } while (loopFinised == false)
 
 }
+
+
+function include(filename) {
+    var head = document.getElementsByTagName('head')[0];
+
+    script = document.createElement('script');
+    script.src = filename;
+    script.type = 'text/javascript';
+
+    head.appendChild(script)
+}
+
