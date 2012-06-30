@@ -91,8 +91,8 @@ var cpaddle = {
 var cball = {
     x: 0,
     y: 0,
-    XSpeed: 2.5,
-    YSpeed: 2.5,
+    xspeed: 2.5,
+    yspeed: 2.5,
     draw: function (surface) {
         that = this;
         surface.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -101,7 +101,7 @@ var cball = {
         surface.arc(that.x, that.y, 5, 0, Math.PI * 2, true);
         surface.closePath();
         surface.fill();
-
+        
     }
 }
 
@@ -148,6 +148,7 @@ function startgame(canvasName) {
 
 
     function gameloop() {
+        that = this;
         rand = 0;
 
         if (rightKeyDown)
@@ -184,6 +185,7 @@ function startgame(canvasName) {
 
         ball.x = ball.x + ball.xspeed;
         ball.y = ball.y + -ball.yspeed;
+        alert(ball.x + " ---- " + ball.y);
 
         if (ball.x < 0 || ball.x > canvasWidth){
             ball.xspeed = -ball.xspeed;
