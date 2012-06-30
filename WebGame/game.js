@@ -185,7 +185,6 @@ function startgame(canvasName) {
 
         ball.x = ball.x + ball.xspeed;
         ball.y = ball.y + -ball.yspeed;
-        alert(ball.x + " ---- " + ball.y);
 
         if (ball.x < 0 || ball.x > canvasWidth){
             ball.xspeed = -ball.xspeed;
