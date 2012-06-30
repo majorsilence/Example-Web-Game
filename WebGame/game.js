@@ -105,6 +105,20 @@ var cball = {
     }
 }
 
+var cscore = {
+    aiscore: 0,
+    playerscore: 0,
+    draw: function (surface) {
+        that = this;
+
+        surface.fillStyle = "blue";
+        surface.font = "12pt Helvetica";
+        //surface.fillText("Score", canvasWidth - 70, canvasHeight / 2);
+        surface.fillText("AI: " + that.aiscore, canvasWidth - 70, (canvasHeight / 2) + 14);
+        surface.fillText("Player: " + that.playerscore, canvasWidth - 70, (canvasHeight / 2)+28);
+    }
+}
+
 function startgame(canvasName) {
     // Doing it this way will give intellisense while in visual studio
     var canvas = Canvas.vsGet(document.getElementById(canvasName));
@@ -135,6 +149,9 @@ function startgame(canvasName) {
     ball.x = player.xpos;
     ball.y = player.ypos - 5;
 
+    // Score
+    var score = Object.create(cscore);
+    
     // Initial Screen Setup
     drawscreen(ctx);
 
@@ -234,6 +251,9 @@ function startgame(canvasName) {
 
         // Redraw ball
         ball.draw(surface);
+
+        // Redraw Score
+        score.draw(surface);
 
     }
 
