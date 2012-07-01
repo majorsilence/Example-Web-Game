@@ -1,5 +1,8 @@
 /// <reference path="canvas-vsdoc.js" />
 include("canvas-utils.js");
+include("paddle.js");
+include("ball.js");
+include("score.js");
 
 // To get intellisense working with canvas see
 // http://abstractform.wordpress.com/2010/02/18/canvas-intellisense-auto-completion-in-visual-studio/
@@ -55,74 +58,6 @@ document.onkeyup = function (evt) {
 // End Setup
 
 
-
-var cpaddle = {
-    width: 32,
-    height: 10,
-    xvelocity: 0,
-    xpos: 0,
-    ypos: 0,
-    paddlespeed: 5,
-    centerpos: function () {
-        that = this;
-        return that.xpos + (that.width / 2);
-    },
-    updatePos: function () {
-        that = this;
-        // update the position of the paddle.  If the paddle
-        // is outside the bounds of the canvas move it back
-        // into the bounds of the canvas
-        if (that.centerpos() + that.xvelocity > canvasWidth - that.width) {
-            xpos = canvasWidth - that.width;
-        }
-        else if (that.xpos + that.xvelocity < 0) {
-            that.xpos = 0;
-        }
-        else {
-            that.xpos = that.xpos + that.xvelocity;
-        }
-
-    },
-    draw: function (surface) {
-        that = this;
-        that.updatePos();
-
-        surface.fillStyle = "rgba(238, 130, 238, 0.5)";
-        surface.fillRect(that.xpos, that.ypos, that.width, that.height);
-    }
-}
-
-var cball = {
-    x: 0,
-    y: 0,
-    xspeed: 2.5,
-    yspeed: 2.5,
-    draw: function (surface) {
-        that = this;
-        surface.fillStyle = "rgba(0, 0, 0, 0.5)";
-
-        surface.beginPath();
-        surface.arc(that.x, that.y, 5, 0, Math.PI * 2, true);
-        surface.closePath();
-        surface.fill();
-        
-    }
-}
-
-var cscore = {
-    aiscore: 0,
-    playerscore: 0,
-    draw: function (surface) {
-        that = this;
-
-        surface.fillStyle = "blue";
-        surface.font = "12pt Helvetica";
-        //surface.fillText("Score", canvasWidth - 70, canvasHeight / 2);
-        surface.fillText("AI: " + that.aiscore, canvasWidth - 70, (canvasHeight / 2) + 14);
-        surface.fillText("Player: " + that.playerscore, canvasWidth - 70, (canvasHeight / 2)+28);
-    }
-}
-
 function startgame(canvasName) {
     // Doing it this way will give intellisense while in visual studio
     var canvas = Canvas.vsGet(document.getElementById(canvasName));
@@ -140,22 +75,29 @@ function startgame(canvasName) {
     
     // Player
     var player = Object.create(cpaddle);
-    player.xpos = canvasWidth / 2;
-    player.ypos = canvasHeight - 20;
+    player.x = canvasWidth / 2;
+    player.y = canvasHeight - 20;
 
     // AI Player
     var ai = Object.create(cpaddle);
-    ai.xpos = canvasWidth / 2;
-    ai.ypos = 20;
+    ai.x = canvasWidth / 2;
+    ai.y = 20;
     
     // Ball
     var ball = Object.create(cball);
-    ball.x = player.xpos;
-    ball.y = player.ypos - 5;
+    ball.x = player.x;
+    ball.y = player.y - 5;
 
     // Score
     var score = Object.create(cscore);
-    
+
+
+    // Game Objects
+    var gameObjects = new Array();
+    gameObjects[0] = player;
+    gameObjects[1] = ai;
+    gameObjects[2] = ball;
+
     // Initial Screen Setup
     drawscreen(ctx);
 
@@ -166,11 +108,8 @@ function startgame(canvasName) {
     // To stop the game, use the following:
     //clearInterval(this._intervalId);
 
-
-
     function gameloop() {
         that = this;
-        rand = 0;
 
         if (rightKeyDown)
         {
@@ -184,82 +123,102 @@ function startgame(canvasName) {
         {
             player.xvelocity = 0;
         }
+      
+        aiPaddleLogic(ball, ai);
+        hasBallHitWall(ball);
+        isBallTouchingPaddle(player);
+        isBallTouchingPaddle(ai);
 
-        // move ai paddle
-        if (ball.yspeed > 0) {
-            rand = 100 * Math.random() % 30;
-            if (ai.xpos > (ball.x - rand)){
-                ai.xvelocity = -ai.paddlespeed;
-            }
-            if (ai.xpos < (ball.x + rand)){
-                ai.xvelocity = ai.paddlespeed;
-            }
-        }
-        else {
-            // if the ball is moving away from the ai paddle and less then 50
-            // points away stop moving
-            if (Math.abs(ai.centerpos() - ball.x) > 250) {
-                if (ai.centerpos() > ball.x) {
-                    ai.xpos += -ai.paddlespeed;
-                }
-                else if (ai.centerpos() < ball.x) {
-                    ai.xpos += ai.paddlespeed;
-                }
-            }
-            else {
-                ai.xvelocity = 0;
-            }
-        }   
-        if (ai.xpos < 0){
-            ai.xpos=3;
-        } 
-        if (ai.xpos >= canvasWidth) {
-            ai.xpos = canvasWidth-30;  
-        }
+        for (var i = 0; i < gameObjects.length; i++) {
+            gameObjects[i].move();
 
-        ball.x = ball.x + ball.xspeed;
-        ball.y = ball.y + -ball.yspeed;
-
-        if (ball.x < 0 || ball.x > canvasWidth){
-            ball.xspeed = -ball.xspeed;
-        }
-
-        if (ball.y < 0) {
-            // Player Scored
-            ball.yspeed = -ball.yspeed;
-            score.playerscore += 1;
-        }
-        else if (ball.y > canvasHeight) {
-            // AI Scored
-            ball.yspeed = -ball.yspeed;
-            score.aiscore += 1;
-        }
-
-        // check to see if hit player paddle
-        // and whether the ball is behind paddle or coming in front
-        // left of paddle is beginning of position x
-        // top of paddle is beginning of position y
-        if (ball.yspeed < 0){
-            if (ball.y >= player.ypos && ball.y <= player.ypos + player.height){
-                if ( (ball.x >= (player.xpos-2)) && (ball.x <= (player.xpos + player.width)) ){
-                    ball.yspeed = -ball.yspeed;
-                }
+            // Make sure the position of the gameObject is within the bounds
+            // of the canvas
+            if (that.centerpos() + that.xvelocity > canvasWidth - that.width) {
+                x = canvasWidth - that.width;
             }
-        }
-        //check to see if ai paddle hit
-        if (ball.yspeed > 0){
-            if (ball.y >= ai.ypos && ball.y <= ai.ypos+ai.height)
-            {
-                if (ball.x >= ai.xpos-2 && ball.x <= ai.xpos + ai.width)
-                {
-                    ball.yspeed = -ball.yspeed;
-                }
+            else if (that.x + that.xvelocity < 0) {
+                that.x = 0;
             }
+
+
         }
 
 
         drawscreen(ctx);
     }
+
+    function aiPaddleLogic(theBall, aiPaddle) {
+        // move ai paddle
+
+
+        if (theBall.yvelocity < 0) {
+            // the ball is moving towards the ai paddle
+
+            rand = (100 * Math.random()) % 40;
+            if (aiPaddle.centerpos() >= (theBall.x - rand)) {
+                aiPaddle.xvelocity = -aiPaddle.paddlespeed;
+            }
+            if (aiPaddle.centerpos() <= (theBall.x + rand)) {
+                aiPaddle.xvelocity = aiPaddle.paddlespeed;
+            }
+        }
+        else {
+            // the ball is moving away from the ai paddle
+            if (Math.abs(aiPaddle.centerpos() - theBall.x) > 250) {
+                if (aiPaddle.centerpos() >= theBall.x) {
+                    aiPaddle.xvelocity += -aiPaddle.paddlespeed;
+                }
+                else if (ai.centerpos() <= theBall.x) {
+                    aiPaddle.xvelocity += aiPaddle.paddlespeed;
+                }
+            }
+            else {
+                aiPaddle.xvelocity = 0;
+            }
+        }
+    
+     }
+     
+    function hasBallHitWall(theBall) {
+
+
+        if (ball.x <= 0 || ball.x >= canvasWidth) {
+            ball.xvelocity = -ball.xvelocity;
+        }
+
+        if (theBall.y <= 0) {
+            // Player Scored
+            theBall.yvelocity = -theBall.yvelocity;
+            score.playerscore += 1;
+        }
+        else if (theBall.y >= canvasHeight) {
+            // AI Scored
+            theBall.yvelocity = -theBall.yvelocity;
+            score.aiscore += 1;
+        }
+    }
+
+    function isBallTouchingPaddle(thePaddle) {
+        // check to see if ball is touching player paddle.  If hit reverse velocity
+        if (ball.yvelocity < 0) {
+           if (ball.y >= thePaddle.y && ball.y <= thePaddle.y + thePaddle.height) {
+               if ((ball.x >= (thePaddle.x - 2)) && (ball.x <= (thePaddle.x + thePaddle.width))) {
+                   ball.yvelocity = -ball.yvelocity;
+                }
+            }
+        }
+        else if (ball.yvelocity > 0) {
+            if (ball.y >= thePaddle.y && ball.y <= thePaddle.y + thePaddle.height)
+            {
+                if (ball.x >= thePaddle.x - 2 && ball.x <= thePaddle.x + thePaddle.width)
+                {
+                    ball.yvelocity = -ball.yvelocity;
+                }
+            }
+        }
+    }
+
 
     function drawscreen(surface) {
 
@@ -277,7 +236,7 @@ function startgame(canvasName) {
         ball.draw(surface);
 
         // Redraw Score
-        score.draw(surface);
+        score.draw(surface, canvasWidth, canvasHeight);
 
     }
 

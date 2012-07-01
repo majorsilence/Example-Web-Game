@@ -25,3 +25,6 @@
 /WebGame/obj/Release/WebGame.vbproj.FileListAbsolute.txt
 /WebGame/obj/Release/WebGame.xml
 /WebGame/bin/assets/background.jpg
+/WebGame/bin/ball.js
+/WebGame/bin/paddle.js
+/WebGame/bin/score.js
