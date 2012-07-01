@@ -108,8 +108,11 @@ function startgame(canvasName) {
     // To stop the game, use the following:
     //clearInterval(this._intervalId);
 
+    gameLoopCount = 0;
+    rand=0;
     function gameloop() {
         that = this;
+        
 
         if (rightKeyDown)
         {
@@ -146,31 +149,38 @@ function startgame(canvasName) {
 
 
         drawscreen(ctx);
+
+        gameLoopCount += 1;
+        if (gameLoopCount > (60 * 5)) {
+            gameLoopCount = 0;
+            rand = (100 * Math.random()) % Math.abs(ai.xvelocity - 1);
+        }
+
     }
 
     function aiPaddleLogic(theBall, aiPaddle) {
         // move ai paddle
 
-
         if (theBall.yvelocity < 0) {
             // the ball is moving towards the ai paddle
 
-            rand = (100 * Math.random()) % 40;
-            if (aiPaddle.centerpos() >= (theBall.x - rand)) {
-                aiPaddle.xvelocity = -aiPaddle.paddlespeed;
+
+            if (aiPaddle.x > (theBall.centerpos() + rand)) {
+                
+                aiPaddle.xvelocity = -aiPaddle.paddlespeed - rand;
             }
-            if (aiPaddle.centerpos() <= (theBall.x + rand)) {
-                aiPaddle.xvelocity = aiPaddle.paddlespeed;
+            else if (aiPaddle.x + aiPaddle.width < (theBall.centerpos() - rand)) {
+                aiPaddle.xvelocity = aiPaddle.paddlespeed - rand;
             }
         }
         else {
             // the ball is moving away from the ai paddle
-            if (Math.abs(aiPaddle.centerpos() - theBall.x) > 250) {
-                if (aiPaddle.centerpos() >= theBall.x) {
-                    aiPaddle.xvelocity += -aiPaddle.paddlespeed;
+            if (Math.abs(aiPaddle.centerpos() - theBall.centerpos()) > 250) {
+                if (aiPaddle.centerpos() >= theBall.centerpos()) {
+                    aiPaddle.xvelocity = -aiPaddle.paddlespeed;
                 }
-                else if (ai.centerpos() <= theBall.x) {
-                    aiPaddle.xvelocity += aiPaddle.paddlespeed;
+                else if (ai.centerpos() <= theBall.centerpos()) {
+                    aiPaddle.xvelocity = aiPaddle.paddlespeed;
                 }
             }
             else {
