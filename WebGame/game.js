@@ -134,24 +134,13 @@ function startgame(canvasName) {
 
         for (var i = 0; i < gameObjects.length; i++) {
             gameObjects[i].move();
-
-            // Make sure the position of the gameObject is within the bounds
-            // of the canvas
-            if (that.centerpos() + that.xvelocity > canvasWidth - that.width) {
-                x = canvasWidth - that.width;
-            }
-            else if (that.x + that.xvelocity < 0) {
-                that.x = 0;
-            }
-
-
         }
 
 
         drawscreen(ctx);
 
         gameLoopCount += 1;
-        if (gameLoopCount > (60 * 5)) {
+        if (gameLoopCount > (60 * 2.5)) {
             gameLoopCount = 0;
             rand = (100 * Math.random()) % Math.abs(ai.xvelocity - 1);
         }
