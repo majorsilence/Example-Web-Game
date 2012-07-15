@@ -3,6 +3,7 @@ include("canvas-utils.js");
 include("paddle.js");
 include("ball.js");
 include("score.js");
+include("buzz.js");
 
 // To get intellisense working with canvas see
 // http://abstractform.wordpress.com/2010/02/18/canvas-intellisense-auto-completion-in-visual-studio/
@@ -98,6 +99,20 @@ function startgame(canvasName) {
     gameObjects[1] = ai;
     gameObjects[2] = ball;
 
+    // Audio
+    if (!buzz.isSupported()) {
+        alert("Your browser does not support html audio.  Install latest chrome, internet explorer, or firefox.!");
+    }
+    if (!buzz.isMP3Supported()) {
+        alert("Your browser doesn't support MP3 Format.");
+    }
+
+    var backroundmusic = new buzz.sound("assets/music.mp3");
+    backroundmusic.play().loop();
+
+    var bounce = new buzz.sound("assets/bounce.mp3");
+    
+
     // Initial Screen Setup
     drawscreen(ctx);
 
@@ -181,20 +196,24 @@ function startgame(canvasName) {
      
     function hasBallHitWall(theBall) {
 
-
         if (ball.x <= 0 || ball.x >= canvasWidth) {
             ball.xvelocity = -ball.xvelocity;
+            bounce.play();
         }
 
         if (theBall.y <= 0) {
             // Player Scored
             theBall.yvelocity = -theBall.yvelocity;
             score.playerscore += 1;
+
+            bounce.play();
         }
         else if (theBall.y >= canvasHeight) {
             // AI Scored
             theBall.yvelocity = -theBall.yvelocity;
             score.aiscore += 1;
+
+            bounce.play();
         }
     }
 
@@ -204,6 +223,8 @@ function startgame(canvasName) {
            if (ball.y >= thePaddle.y && ball.y <= thePaddle.y + thePaddle.height) {
                if ((ball.x >= (thePaddle.x - 2)) && (ball.x <= (thePaddle.x + thePaddle.width))) {
                    ball.yvelocity = -ball.yvelocity;
+
+                   bounce.play();
                 }
             }
         }
@@ -213,6 +234,8 @@ function startgame(canvasName) {
                 if (ball.x >= thePaddle.x - 2 && ball.x <= thePaddle.x + thePaddle.width)
                 {
                     ball.yvelocity = -ball.yvelocity;
+
+                    bounce.play();
                 }
             }
         }
