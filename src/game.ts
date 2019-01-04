@@ -61,7 +61,8 @@ document.onkeyup = function (evt) {
 
 function startgame(canvasName) {
     // Doing it this way will give intellisense while in visual studio
-    var canvas = Canvas.vsGet(document.getElementById(canvasName));
+    //var canvas = Canvas.vsGet(document.getElementById(canvasName));
+    var canvas = <HTMLCanvasElement>document.getElementById(canvasName);
 
     //The normal way to get a canvas
 	//var canvas = document.getElementById(canvasName);

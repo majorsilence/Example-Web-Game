@@ -1,0 +1,10 @@
+﻿<Properties StartupConfiguration="{8459ED87-FAAE-4BE1-85B3-69EE85F8D5FC}|">
+  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.WebGame PreferredExecutionTarget="/usr/bin/google-chrome-stable" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
